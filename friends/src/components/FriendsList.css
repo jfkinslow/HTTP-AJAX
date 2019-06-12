@@ -1,0 +1,14 @@
+#FriendsList {
+	border: 1px solid black;
+	margin: 10px auto;
+	max-width: 450px;
+}
+
+#FriendsList h1 {
+	border-bottom: 2px solid black;
+	padding-bottom: 13px;
+	margin: 15px auto;
+	font-size: 3.2rem;
+	line-height: 3.2rem;
+	max-width: 400px;
+}
