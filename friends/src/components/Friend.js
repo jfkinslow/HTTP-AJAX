@@ -29,7 +29,10 @@ export default class Friend extends React.Component {
 				>
 					Delete
 				</button>
-				<Link className="btn-primary btn-update" to={`/update/${this.state.friend.id}`}>
+				<Link
+					className="btn-primary btn-update"
+					to={{ pathname: `/update/${this.state.friend.id}`, state: { friend: this.state.friend } }}
+				>
 					Update
 				</Link>
 			</div>

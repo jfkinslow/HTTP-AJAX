@@ -2,6 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+let baseDir = __dirname;
+const friendsFilePath = path.resolve(baseDir, './friends.json').toString();
+const configFilePath = path.resolve(baseDir, './config.json');
 
 const app = express();
 let nextId = 7;
@@ -9,8 +13,7 @@ let nextId = 7;
 function getNewId() {
 	return nextId++;
 }
-
-let friends = [
+let newFriends = [
 	{
 		id: 1,
 		name: 'Ben',
@@ -49,6 +52,22 @@ let friends = [
 	},
 ];
 
+let configFile = fs.readFileSync(configFilePath);
+let config = JSON.parse(configFile);
+let friends = [];
+console.log(config);
+
+if (config.first_run === true) {
+	let jsonOut = JSON.stringify(newFriends);
+	fs.writeFileSync(friendsFilePath, jsonOut);
+	config.first_run = false;
+	friends = newFriends;
+	jsonOut = JSON.stringify(config);
+	fs.writeFileSync(configFilePath, jsonOut);
+} else {
+	let jsonIn = fs.readFileSync(friendsFilePath);
+	friends = JSON.parse(jsonIn);
+}
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -63,6 +82,8 @@ app.get('/friends', (req, res) => {
 app.post('/friends', (req, res) => {
 	const friend = { id: getNewId(), ...req.body };
 	friends = [...friends, friend];
+	let jsonOut = JSON.stringify(friends);
+	fs.writeFileSync(friendsFilePath, jsonOut);
 	res.status(201).json(friends);
 });
 
@@ -72,6 +93,8 @@ app.put('/friends/:id', (req, res) => {
 
 	if (friendIndex >= 0) {
 		friends[friendIndex] = { ...friends[friendIndex], ...req.body };
+		let jsonOut = JSON.stringify(friends);
+		fs.writeFileSync(friendsFilePath, jsonOut);
 		res.status(200).json(friends);
 	} else {
 		res.status(404).json({ message: `The friend with id ${id} does not exist.` });
@@ -80,9 +103,12 @@ app.put('/friends/:id', (req, res) => {
 
 app.delete('/friends/:id', (req, res) => {
 	friends = friends.filter(friend => friend.id != req.params.id);
+	let jsonOut = JSON.stringify(friends);
+	fs.writeFileSync(friendsFilePath, jsonOut);
+
 	res.status(200).json(friends);
 });
 
-app.listen(5000, () => {
-	console.log('server listening on port 5000');
+app.listen(config.port, () => {
+	console.log(`server listening on port ${config.port}`);
 });

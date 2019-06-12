@@ -4,6 +4,7 @@ import FriendsList from './components/FriendsList';
 import AddFriend from './components/AddFriend';
 import { Route } from 'react-router-dom';
 import axios from 'axios';
+import UpdateFriend from './components/UpdateFriend';
 
 class App extends React.Component {
 	constructor(props) {
@@ -31,6 +32,7 @@ class App extends React.Component {
 			return <Component {...props} {...matchProps} />;
 		};
 	}
+	componentWillReceiveProps() {}
 
 	onDeleteHandler(e, deletedFriend) {
 		e.preventDefault();
@@ -52,10 +54,10 @@ class App extends React.Component {
 					component={this.withProps(FriendsList, {
 						friends: this.state.friends,
 						parent: this,
-						onDeleteHandler: this.onDeleteHandler,
+						onDeleteHandler: this.onDeleteHandler.bind(this),
 					})}
 				/>
-				<Route path="/update/:id" component={undefined} />
+				<Route path="/update/:id" component={this.withProps(UpdateFriend, { parent: this })} />
 				<Route
 					path="/add"
 					component={this.withProps(AddFriend, {
